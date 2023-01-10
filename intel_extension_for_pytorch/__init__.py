@@ -7,8 +7,14 @@ from ._version import (__version__, __ipex_git_sha__,
 
 from . import optim
 
+# resolve this by using _init_.py instead
+#################################################
+import sys
+sys.path.insert(0, './csrc/oneStorage/build')
+#################################################
 
 def version():
+    print("My Test")    
     print("intel_extension_for_pytorch gpu version:          {}".format(__version__))
     print("intel_extension_for_pytorch gpu git sha:          {}".format(__ipex_git_sha__))
     print("private gpu torch version: {}".format(__torch_version__))
@@ -62,3 +68,4 @@ cmake_prefix_path = os.path.join(os.path.dirname(__file__), 'share', 'cmake')
 
 import intel_extension_for_pytorch.xpu
 from .frontend import optimize
+from .onestorage import oneFileDataset, oneFileIterableDataset
