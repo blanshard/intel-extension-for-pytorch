@@ -14,7 +14,6 @@ sys.path.insert(0, './csrc/oneStorage/build')
 #################################################
 
 def version():
-    print("My Test")    
     print("intel_extension_for_pytorch gpu version:          {}".format(__version__))
     print("intel_extension_for_pytorch gpu git sha:          {}".format(__ipex_git_sha__))
     print("private gpu torch version: {}".format(__torch_version__))

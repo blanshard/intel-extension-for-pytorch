@@ -5,7 +5,7 @@
 #include <chrono>
 #include <cstring>
 #include "io.h"
-#include "../../third_party/oneStorage/include/oneapi/onestorage/onefile.h"
+#include "oneapi/onestorage.h"
 
 namespace fs = std::filesystem;
 
