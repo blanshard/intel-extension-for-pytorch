@@ -22,6 +22,12 @@ from ._version import (__version__, __ipex_gitrev__, __torch_gitrev__,
 from .utils import _cpu_isa, _custom_fx_tracer
 _cpu_isa.check_minimal_isa_support()
 
+#################################################
+import sys
+sys.path.insert(0, '../csrc/oneStorage/build')
+#################################################
+from _pywrap_oneFile import oneFile
+from .onestorage import oneFileDataset, oneFileIterableDataset
 
 def version():
     print("intel_extension_for_pytorch version:          {}".format(__version__))

@@ -7,3 +7,6 @@
 [submodule "third_party/ideep"]
 	path = third_party/ideep
 	url = https://github.com/intel/ideep.git
+[submodule "third_party/oneStorage"]
+	path = third_party/oneStorage
+	url = https://github.com/intel-sandbox/libraries.performance.storage.onestorage.git
