@@ -1,5 +1,4 @@
 import torch
-import torchvision
 ############# code changes ###############
 import intel_extension_for_pytorch as ipex
 ############# code changes ###############
@@ -9,41 +8,45 @@ import torch.nn as nn
 from torch.nn import functional as F
 import torch.optim as optim
 
+from onestor.image_classification import train
+from onestor.image_classification import get_torch_dataloaders
+from onestor.image_classification import save_model, print_train_time
+
+# Setup hyperparameters
+NUM_EPOCHS = 10
+BATCH_SIZE = 32
+
+# Setup directories
+train_dir = "./onestor/image_classification/data/train"
+test_dir  = "./onestor/image_classification/data/validation"
+
+# Setup target device
+device = torch.device("xpu" if ipex.xpu.is_available() else "cpu")
+print(device)
+
+# Start the timer
+from timeit import default_timer as timer 
+start_time = timer()
+
+# Create transforms
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
 
-data_transforms = {
-    'train':
-    transforms.Compose([
-        transforms.Resize((224,224)),
-        transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        normalize
-    ]),
-    'validation':
-    transforms.Compose([
-        transforms.Resize((224,224)),
-        transforms.ToTensor(),
-        normalize
-    ]),
-}
+data_transform = transforms.Compose([
+    transforms.Resize((224,224)),
+    transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    normalize
+    ])
 
-image_datasets = {
-    'train':      datasets.ImageFolder('data/train', data_transforms['train']),
-    'validation': datasets.ImageFolder('data/validation', data_transforms['validation'])
-}
-
-dataloaders = {
-    'train':      torch.utils.data.DataLoader(image_datasets['train'],
-                                batch_size=32,
-                                shuffle=True, num_workers=4),
-    'validation': torch.utils.data.DataLoader(image_datasets['validation'],
-                                batch_size=32,
-                                shuffle=False, num_workers=4)
-}
-
-device = torch.device("xpu" if ipex.xpu.is_available() else "cpu")
+# Create DataLoaders with help from data_setup.py
+train_dataloader, test_dataloader, class_names = get_torch_dataloaders(
+    train_dir   = train_dir,
+    test_dir    = test_dir,
+    transform   = data_transform,
+    batch_size  = BATCH_SIZE
+)
 
 model = models.resnet50().to(device)
     
@@ -55,45 +58,24 @@ model.fc = nn.Sequential(
                nn.ReLU(inplace=True),
                nn.Linear(128, 2)).to(device)
 
-criterion = nn.CrossEntropyLoss()
+# Set loss and optimizer
+loss_fn   = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.fc.parameters())
 
-def train_model(model, criterion, optimizer, num_epochs=3):
-    for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch+1, num_epochs))
-        print('-' * 10)
+train(model = model,
+    train_dataloader = train_dataloader,
+    test_dataloader = test_dataloader,
+    optimizer = optimizer,
+    loss_fn = loss_fn,
+    epochs =  NUM_EPOCHS,
+    device = device)
 
-        for phase in ['train', 'validation']:
-            if phase == 'train':
-                model.train()
-            else:
-                model.eval()
+# End the timer and print out how long it took
+end_time = timer()
 
-            running_loss = 0.0
-            running_corrects = 0
+print_train_time(start_time, end_time, device)
 
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-
-                outputs = model(inputs)
-                loss = criterion(outputs, labels)
-
-                if phase == 'train':
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
-
-                _, preds = torch.max(outputs, 1)
-                running_loss += loss.detach() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-
-            epoch_loss = running_loss / len(image_datasets[phase])
-            epoch_acc = running_corrects.float() / len(image_datasets[phase])
-
-            print('{} loss: {:.4f}, acc: {:.4f}'.format(phase,
-                                                        epoch_loss.item(),
-                                                        epoch_acc.item()))
-    return model
-
-model_trained = train_model(model, criterion, optimizer, num_epochs=3)
+# Save the model with help from utils.py
+save_model(model=model,
+                 target_dir="models",
+                 model_name="saved_model.pth")
