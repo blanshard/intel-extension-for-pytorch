@@ -9,7 +9,7 @@ from torch.nn import functional as F
 import torch.optim as optim
 
 from onestor.image_classification import train
-from onestor.image_classification import get_torch_dataloaders
+from onestor.image_classification import get_torch_dataloaders, get_onestor_dataloaders
 from onestor.image_classification import save_model, print_train_time
 
 # Setup hyperparameters
@@ -17,8 +17,8 @@ NUM_EPOCHS = 10
 BATCH_SIZE = 32
 
 # Setup directories
-train_dir = "./onestor/image_classification/data/train"
-test_dir  = "./onestor/image_classification/data/validation"
+train_dir = "/mnt/data/datasets/pizza_steak_sushi/train"
+test_dir  = "/mnt/data/datasets/pizza_steak_sushi/test"
 
 # Setup target device
 device = torch.device("xpu" if ipex.xpu.is_available() else "cpu")
@@ -26,7 +26,6 @@ print(device)
 
 # Start the timer
 from timeit import default_timer as timer 
-start_time = timer()
 
 # Create transforms
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -36,19 +35,19 @@ data_transform = transforms.Compose([
     transforms.Resize((224,224)),
     transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)),
     transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
+    #transforms.ToTensor(),
     normalize
     ])
 
 # Create DataLoaders with help from data_setup.py
-train_dataloader, test_dataloader, class_names = get_torch_dataloaders(
+train_dataloader, test_dataloader, class_names = get_onestor_dataloaders(
     train_dir   = train_dir,
     test_dir    = test_dir,
     transform   = data_transform,
     batch_size  = BATCH_SIZE
 )
 
-model = models.resnet50().to(device)
+model = models.resnet50(pretrained=True).to(device)
     
 for param in model.parameters():
     param.requires_grad = False   
@@ -61,6 +60,8 @@ model.fc = nn.Sequential(
 # Set loss and optimizer
 loss_fn   = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.fc.parameters())
+
+start_time = timer()
 
 train(model = model,
     train_dataloader = train_dataloader,
