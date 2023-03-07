@@ -196,3 +196,7 @@ csrc/aten/generated/*
 
 # Clion files
 .idea
+
+# temp data
+intel_extension_for_pytorch/onestor/image_classification/data
+intel_extension_for_pytorch/onestor/image_classification/datasets
