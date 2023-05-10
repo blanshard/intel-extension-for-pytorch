@@ -60,7 +60,7 @@ int oneFile::read(const std::string &filename, std::string *result)
     // open the dataset, select the proper connector
     status = onestorage_dset_open(filename.c_str(), "uring", dset);
 
-    status = onefile_open(dset, filename.c_str(), oneFileHandle);
+    status = onefile_open(dset, filename.c_str(), true, oneFileHandle);
 
     if (status == -1)
     {
