@@ -6,9 +6,9 @@ from itertools import chain
 
 # resolve this by using _init_.py instead
 #################################################
-import sys
-sys.path.insert(0, '../csrc/oneStorage/build')
-from _pywrap_oneFile import oneFile
+#import sys
+#sys.path.insert(0, '../csrc/oneStorage/build')
+#from _pywrap_oneFile import oneFile
 #################################################
 
 class oneFileDataset(Dataset):

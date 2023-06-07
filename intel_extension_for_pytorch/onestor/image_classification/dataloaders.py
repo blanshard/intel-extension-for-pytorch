@@ -18,13 +18,14 @@ warnings.filterwarnings("ignore")
 # resolve this by using _init_.py instead
 #################################################
 import sys
-sys.path.insert(0, '../../../csrc/oneStorage/build')
+sys.path.insert(0, '../../../third_party/oneStorage/src/python/build/')
 from _pywrap_oneFile import oneFile
 #################################################
 
 from PIL import Image
 
-NUM_WORKERS = os.cpu_count()
+#NUM_WORKERS = os.cpu_count()
+NUM_WORKERS = 0
 
 def onestor_loader(path: str) -> torch.Tensor:
     #return io.read_image(path, io.image.ImageReadMode.RGB).type(torch.float32)
@@ -34,10 +35,12 @@ def onestor_loader(path: str) -> torch.Tensor:
     img_tensor = torch.frombuffer(data, dtype=torch.uint8)
     return io.decode_image(img_tensor, io.image.ImageReadMode.RGB).type(torch.float32)
 
-#def onestor_loader(path: str) -> Image.Image:
-#    with open(path, "rb") as f:
-#        img = Image.open(f)
-#        return img.convert("RGB")
+#def torch_loader(path: str) -> Image.Image:
+def torch_loader(path: str) -> torch.Tensor:
+    transform = transforms.Compose([ transforms.PILToTensor()])
+    with open(path, "rb") as f:
+        img = Image.open(f)
+        return transform(img.convert("RGB")).type(torch.float32)
 
 def get_torch_dataloaders(
     train_dir: str, 
@@ -70,11 +73,11 @@ def get_torch_dataloaders(
                              num_workers=4)
   """
   # Use ImageFolder to create dataset(s)
-  train_data = datasets.ImageFolder(train_dir, transform=transform, loader = onestor_loader)
-  test_data  = datasets.ImageFolder(test_dir,  transform=transform, loader = onestor_loader)
+  #train_data = datasets.ImageFolder(train_dir, transform=transform, loader = torch_loader)
+  #test_data  = datasets.ImageFolder(test_dir,  transform=transform, loader = torch_loader)
 
-  #train_data = datasets.ImageFolder(train_dir, transform=transform)
-  #test_data  = datasets.ImageFolder(test_dir,  transform=transform)
+  train_data = datasets.ImageFolder(train_dir, transform=transform)
+  test_data  = datasets.ImageFolder(test_dir,  transform=transform)
 
   # Get class names
   class_names = train_data.classes
