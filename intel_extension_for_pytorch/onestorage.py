@@ -4,12 +4,9 @@ from torch.utils.data import IterableDataset, Dataset
 import torch.distributed as dist
 from itertools import chain
 
-# resolve this by using _init_.py instead
-#################################################
-#import sys
-#sys.path.insert(0, '../csrc/oneStorage/build')
-#from _pywrap_oneFile import oneFile
-#################################################
+############# code changes ###############
+from onefile import oneFile
+############# code changes ###############
 
 class oneFileDataset(Dataset):
     """A mapped-style dataset.

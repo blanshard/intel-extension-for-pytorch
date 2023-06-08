@@ -11,13 +11,9 @@ from torchvision.datasets.folder import find_classes
 
 import accimage
 
-# resolve this by using _init_.py instead
-#################################################
-import sys
-sys.path.insert(0, '../third_party/oneStorage/src/python/build/')
-from _pywrap_oneFile import oneFile
-#print(dir(oneFile))
-#################################################
+############# code changes ###############
+from onefile import oneFile
+############# code changes ###############
 
 def onestor_loader(path: str) -> torch.Tensor:
     #return io.read_image(path, io.image.ImageReadMode.RGB).type(torch.float32)

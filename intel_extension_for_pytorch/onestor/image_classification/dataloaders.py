@@ -15,12 +15,10 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-# resolve this by using _init_.py instead
-#################################################
-import sys
-sys.path.insert(0, '../../../third_party/oneStorage/src/python/build/')
-from _pywrap_oneFile import oneFile
-#################################################
+############# code changes ###############
+import intel_extension_for_pytorch as ipex
+from onestor.image_classification.datasets import ImageFolderOneStor
+############# code changes ###############
 
 from PIL import Image
 
