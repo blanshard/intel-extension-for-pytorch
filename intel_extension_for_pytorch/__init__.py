@@ -114,8 +114,8 @@ _cpu_isa.check_minimal_isa_support()
 
 
 def version():
-    print("intel_extension_for_pytorch version:          {}".format(__version__))
-    print("intel_extension_for_pytorch git sha:          {}".format(__ipex_gitrev__))
+    print("ipex_mpu version:          {}".format(__version__))
+    print("ipex_mpu git sha:          {}".format(__ipex_gitrev__))
     if len(__torch_gitrev__) != 0:
         print("torch version and sha:     {}".format(__torch_gitrev__))
     print("submodule oneDNN sha:      {}".format(__gpu_onednn_gitrev__))
