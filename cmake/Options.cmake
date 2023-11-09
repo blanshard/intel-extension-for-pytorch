@@ -28,6 +28,10 @@ if(BUILD_MODULE_TYPE STREQUAL "GPU")
   include(${IPEX_ROOT_DIR}/cmake/gpu/Options.cmake)
 endif()
 
+if(BUILD_MODULE_TYPE STREQUAL "MPU")
+  include(${IPEX_ROOT_DIR}/cmake/mpu/Options.cmake)
+endif()
+
 function (print_config_summary)
   message(STATUS "")
 

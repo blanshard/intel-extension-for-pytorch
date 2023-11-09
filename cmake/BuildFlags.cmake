@@ -4,12 +4,18 @@ if(BUILD_OPTIONS_cmake_included)
 endif()
 set(BUILD_OPTIONS_cmake_included true)
 
+message(WARNING "BUILD_MODULE_TYPE: ${BUILD_MODULE_TYPE}!")
+
 if(BUILD_MODULE_TYPE STREQUAL "CPU")
   include(${IPEX_ROOT_DIR}/cmake/cpu/BuildFlags.cmake)
 endif()
 
 if(BUILD_MODULE_TYPE STREQUAL "GPU")
   include(${IPEX_ROOT_DIR}/cmake/gpu/BuildFlags.cmake)
+endif()
+
+if(BUILD_MODULE_TYPE STREQUAL "MPU")
+  include(${IPEX_ROOT_DIR}/cmake/mpu/BuildFlags.cmake)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
